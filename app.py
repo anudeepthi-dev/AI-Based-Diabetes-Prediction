@@ -14,9 +14,9 @@ st.set_page_config(
     layout="wide"
 )
 
-BASE_DIR = Path(__file__).parent
+BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / "model" / "diabetes_model_deploy.pkl"
-DATASET_PATH = BASE_DIR / "diabetes_012_health_indicators_BRFSS2015.CSV"
+DATASET_PATH = BASE_DIR / "diabetes_012_health_indicators_BRFSS2015.csv"
 
 FEATURES = [
     "HighBP",
@@ -305,7 +305,7 @@ if page == "Diabetes Prediction":
 
         submitted = st.form_submit_button(
             "🔍 Predict Diabetes Category",
-            use_container_width=True
+            width="stretch"
         )
 
     # -----------------------------------------------------
@@ -524,7 +524,10 @@ elif page == "Dataset Analysis":
 
     st.write("Preview of the dataset:")
 
-    st.dataframe(dataset.head(10), use_container_width=True)
+    st.dataframe(
+        dataset.head(10),
+        width="stretch"
+    )
 
     # -----------------------------------------------------
     # TARGET DISTRIBUTION
@@ -557,7 +560,7 @@ elif page == "Dataset Analysis":
     st.dataframe(
         target_chart,
         hide_index=True,
-        use_container_width=True
+        width="stretch"
     )
 
     # -----------------------------------------------------
@@ -695,7 +698,11 @@ elif page == "Dataset Analysis":
 
     ax.set_title("Correlation Between Health Indicators")
 
-    fig.colorbar(image, ax=ax, label="Correlation coefficient")
+    fig.colorbar(
+        image,
+        ax=ax,
+        label="Correlation coefficient"
+    )
 
     fig.tight_layout()
 
@@ -735,7 +742,7 @@ elif page == "Dataset Analysis":
         st.dataframe(
             missing_frame,
             hide_index=True,
-            use_container_width=True
+            width="stretch"
         )
 
 # =========================================================
