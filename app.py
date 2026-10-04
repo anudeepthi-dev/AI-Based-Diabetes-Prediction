@@ -479,7 +479,7 @@ elif page == "Dataset Analysis":
 
         st.error(
             "Dataset file not found. Place "
-            "'diabetes_012_health_indicators_BRFSS2015.CSV' "
+            "'diabetes_012_health_indicators_BRFSS2015.csv' "
             "in the same folder as app.py."
         )
 
