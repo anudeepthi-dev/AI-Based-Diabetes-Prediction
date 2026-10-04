@@ -2,121 +2,226 @@
 
 ## 1. Project Overview
 
-The **AI-Based Diabetes Prediction System** is an educational machine-learning project that uses a Random Forest classifier to classify health-indicator information into two categories:
+The **AI-Based Diabetes Prediction System** is an educational machine-learning project that uses a **Random Forest Classifier** to classify health-indicator information into two categories:
 
-- **Class 0 — Non-diabetic category:** Combines the original dataset's `No diabetes (0)` and `Prediabetes (1)` labels.
-- **Class 1 — Diabetic category:** Corresponds to the original dataset's `Diabetes (2)` label.
+- **Class 0 — Non-Diabetic:** Combines the original dataset's No Diabetes (0) and Prediabetes (1) categories.
+- **Class 1 — Diabetic:** Corresponds to the original dataset's Diabetes (2) category.
 
-The Streamlit web application has two pages:
+The project provides an interactive **Streamlit web application** with two main pages:
 
-1. **Diabetes Prediction** — accepts health-indicator inputs and displays the model's predicted category, its estimated probability for the diabetic class, a summary of the inputs, and a chart of selected binary indicators.
-2. **Dataset Analysis** — displays dataset information and visualizations, including target-category counts, BMI distribution, diabetes categories across age groups, average BMI by category, a correlation heatmap, and missing-value analysis.
+### Diabetes Prediction
+Accepts health-indicator inputs and displays:
 
-> **Important:** This is an educational demonstration, not a medical diagnostic tool. Predictions and model probabilities are not clinically validated measures of an individual's diabetes risk. Do not use them for medical decisions.
+- Predicted diabetes category
+- Model-estimated probability for the diabetic class
+- Summary of selected inputs
+- Visualization of selected binary health indicators
+
+### Dataset Analysis
+Provides exploratory analysis and visualizations, including:
+
+- Dataset information
+- Diabetes-category distribution
+- BMI distribution
+- Diabetes categories across age groups
+- Average BMI by diabetes category
+- Correlation heatmap
+- Missing-value analysis
+
+> **Important:** This project is intended for educational and demonstration purposes only. It is **not a medical diagnostic tool**. Model predictions and probabilities are not clinically validated and must not be used for medical diagnosis, treatment, or healthcare decisions.
+
+---
 
 ## 2. Project Objectives
 
+The main objectives of this project are:
+
 - Build a supervised machine-learning classifier using health-indicator data.
 - Train and evaluate a Random Forest model.
+- Perform feature selection using Random Forest feature importance.
 - Provide an interactive web interface for entering health indicators.
-- Display a predicted category and the model-estimated probability of the diabetic class.
-- Explore the dataset with charts and correlation analysis.
-- Document the dataset, model evaluation, setup, and limitations.
+- Display a predicted diabetes category and model-estimated probability.
+- Explore the dataset using charts and correlation analysis.
+- Demonstrate an end-to-end machine-learning workflow from data preparation to deployment.
+- Document the model evaluation, application features, and limitations.
+
+---
 
 ## 3. Dataset
 
-**Expected file name:** `diabetes_012_health_indicators_BRFSS2015.CSV`
+The project uses the **CDC BRFSS 2015 Diabetes Health Indicators dataset**.
 
-The dataset used is the CDC BRFSS 2015 Diabetes Health Indicators dataset. The local file used during development contains:
+### Dataset File
 
-- **253,680 records**
-- **22 columns:** 21 input features and one target column, `Diabetes_012`
-- **0 missing values** detected in the dataset used during development
+The dataset included in the project is:
 
-The original target column has three values:
+```text
+diabetes_012_health_indicators_BRFSS2015.csv
+```
 
-| Original value | Meaning | Count |
-|---:|---|---:|
-| 0 | No diabetes | 213,703 |
+### Dataset Information
+
+- **Records:** 253,680
+- **Columns:** 22
+- **Input features:** 21
+- **Target column:** `Diabetes_012`
+- **Missing values:** 0 detected in the dataset used during development
+
+### Original Target Categories
+
+| Original Value | Meaning | Count |
+|---|---|---:|
+| 0 | No Diabetes | 213,703 |
 | 1 | Prediabetes | 4,631 |
 | 2 | Diabetes | 35,346 |
 | **Total** | | **253,680** |
 
-Dataset source: [UCI Machine Learning Repository — CDC Diabetes Health Indicators](https://archive.ics.uci.edu/dataset/891/cdc+diabetes+health+indicators).
+The dataset contains survey-based health indicators and demographic categories. It does **not** contain a glucose measurement column, so the application does not request glucose as an input.
 
-### Input features
+### Input Features
 
-The model expects these 21 columns in this order:
+The model expects the following 21 input features:
 
-`HighBP`, `HighChol`, `CholCheck`, `BMI`, `Smoker`, `Stroke`, `HeartDiseaseorAttack`, `PhysActivity`, `Fruits`, `Veggies`, `HvyAlcoholConsump`, `AnyHealthcare`, `NoDocbcCost`, `GenHlth`, `MentHlth`, `PhysHlth`, `DiffWalk`, `Sex`, `Age`, `Education`, `Income`.
+```text
+HighBP
+HighChol
+CholCheck
+BMI
+Smoker
+Stroke
+HeartDiseaseorAttack
+PhysActivity
+Fruits
+Veggies
+HvyAlcoholConsump
+AnyHealthcare
+NoDocbcCost
+GenHlth
+MentHlth
+PhysHlth
+DiffWalk
+Sex
+Age
+Education
+Income
+```
 
-These are survey-based health indicators and demographic categories, not current clinical laboratory measurements. The dataset does not include a glucose measurement column, so the application does not ask for glucose.
+---
 
 ## 4. Target Label Preparation
 
-The training script converts the original three-category target into a binary target:
+The original dataset contains three target categories. For this project, the target was converted into a binary classification problem.
 
-- Original `Diabetes_012 = 0` → model class `0`
-- Original `Diabetes_012 = 1` → model class `0`
-- Original `Diabetes_012 = 2` → model class `1`
+| Original `Diabetes_012` | Model Class | Meaning |
+|---|---|---|
+| 0 | 0 | Non-Diabetic |
+| 1 | 0 | Non-Diabetic |
+| 2 | 1 | Diabetic |
 
-Therefore, **the model's non-diabetic class includes the original prediabetes category**. This simplification should be considered when interpreting results.
+Therefore:
 
-## 5. Machine-Learning Method and Preprocessing
+```text
+Original 0 → Model 0
+Original 1 → Model 0
+Original 2 → Model 1
+```
 
-The project uses a **Random Forest Classifier** from scikit-learn. The current training workflow includes:
+The model's **Non-Diabetic** class therefore includes both the original No Diabetes and Prediabetes categories.
 
-1. Loading the CSV dataset using Pandas.
-2. Validating that the target column exists and that the expected 21 input features are present.
-3. Checking the target values and checking for missing values. The script stops with an error if missing values are found; it does not impute them.
-4. Converting the original three-category target into the binary target described above.
-5. Splitting data into training and test sets with an 80/20 split and stratification, using `random_state=42`.
-6. Training a Random Forest model on the training set to estimate feature importance.
-7. Selecting features with `SelectFromModel` using the median feature-importance threshold.
-8. Training a final Random Forest classifier using the selected features.
-9. Evaluating the final model on the held-out test set.
-10. Saving the feature-selection and classification steps together as a pipeline in `model/diabetes_model.pkl`.
-11. Saving the selected features' importance values to `model/feature_importance.csv`.
+This simplification should be considered when interpreting the model's results.
 
-The Random Forest settings used for the selector and final classifier are `n_estimators=100`, `random_state=42`, `class_weight="balanced"`, and `n_jobs=-1`.
+---
 
-**Other preprocessing:** Numeric scaling and categorical encoding are not performed in this workflow. Random Forest generally does not require feature scaling, but that does not mean the input features have been normalized or standardized.
+## 5. Machine-Learning Method
+
+The project uses a **Random Forest Classifier** from `scikit-learn`.
+
+### Training Workflow
+
+The training process includes:
+
+1. Loading the dataset using Pandas.
+2. Validating the target column.
+3. Validating the expected input features.
+4. Checking target values.
+5. Checking for missing values.
+6. Converting the original three-category target into a binary target.
+7. Splitting the dataset into training and testing sets.
+8. Performing feature selection using Random Forest feature importance.
+9. Training the final Random Forest classifier using the selected features.
+10. Evaluating the model on the test dataset.
+11. Saving the trained model pipeline.
+12. Saving feature-importance information.
+
+### Data Split
+
+The dataset is divided into:
+
+- **80% training data**
+- **20% testing data**
+
+The split uses stratification and:
+
+```text
+random_state = 42
+```
+
+### Random Forest Configuration
+
+The original training configuration uses:
+
+```text
+n_estimators = 100
+random_state = 42
+class_weight = "balanced"
+n_jobs = -1
+```
+
+Feature selection is performed using `SelectFromModel` with the median feature-importance threshold.
+
+> **Deployment note:** A smaller deployment model, `diabetes_model_deploy.pkl`, is included in the repository so that the application can be hosted within GitHub's file-size limits. The original larger model remains available locally for development.
+
+Random Forest does not require numerical feature scaling for this workflow, so normalization or standardization is not performed.
+
+---
 
 ## 6. Model Evaluation
 
-The Random Forest classification algorithm was used to train and evaluate the diabetes prediction model. Feature selection was performed using Random Forest feature importance to identify the most relevant input features.
+The model was evaluated using:
 
-The dataset was divided into **80% training data and 20% testing data**. The model was evaluated using accuracy, precision, recall, F1-score, and ROC-AUC.
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- ROC-AUC
 
 ### 6.1 Model Performance
 
 | Evaluation Metric | Result |
 |---|---:|
-| Accuracy | 80.12% |
-| Precision | 33.66% |
-| Recall | 43.95% |
-| F1-score | 38.12% |
-| ROC-AUC | 76.97% |
+| Accuracy | **80.12%** |
+| Precision | **33.66%** |
+| Recall | **43.95%** |
+| F1-score | **38.12%** |
+| ROC-AUC | **76.97%** |
 
 ### 6.2 Selected Features
 
-The feature selection process identified the following 11 features for training the final model:
+The feature-selection process identified the following important features:
 
-1. `HighBP`
-2. `HighChol`
-3. `BMI`
-4. `Smoker`
-5. `Fruits`
-6. `GenHlth`
-7. `MentHlth`
-8. `PhysHlth`
-9. `Age`
-10. `Education`
-11. `Income`
+1. HighBP
+2. HighChol
+3. BMI
+4. Smoker
+5. Fruits
+6. GenHlth
+7. MentHlth
+8. PhysHlth
+9. Age
+10. Education
+11. Income
 
 ### 6.3 Classification Report
-
-The model's classification results on the test dataset were:
 
 | Class | Precision | Recall | F1-score | Test Records |
 |---|---:|---:|---:|---:|
@@ -125,18 +230,19 @@ The model's classification results on the test dataset were:
 
 ### 6.4 Confusion Matrix
 
-The confusion matrix produced the following results:
-
 | Actual Class | Predicted Non-Diabetic | Predicted Diabetic |
 |---|---:|---:|
 | Non-Diabetic | 37,543 | 6,124 |
 | Diabetic | 3,962 | 3,107 |
 
-The model correctly classified 37,543 non-diabetic cases and 3,107 diabetic cases in the test dataset.
+The model correctly classified:
+
+- **37,543** non-diabetic cases
+- **3,107** diabetic cases
 
 ### 6.5 Feature Importance
 
-The top features contributing to the model's predictions were:
+The major features contributing to the model's predictions included:
 
 | Feature | Importance |
 |---|---:|
@@ -151,71 +257,130 @@ The top features contributing to the model's predictions were:
 | HighChol | 0.0399 |
 | Fruits | 0.0300 |
 
-BMI had the highest feature importance among the selected features, followed by Age and GenHlth.
+**BMI** had the highest feature importance among the selected features, followed by **Age** and **General Health (`GenHlth`)**.
 
 ### 6.6 Evaluation Summary
 
-The model achieved **80.12% accuracy** and a **76.97% ROC-AUC score** on the test dataset. However, its recall for the diabetic class was 43.95%, meaning it identified fewer than half of the diabetic cases in the test set. Its precision for that class was 33.66%.
+The model achieved an accuracy of **80.12%** and an ROC-AUC of **76.97%** on the test dataset.
 
-These results indicate that the model has limitations in identifying diabetic cases. It is suitable as an educational machine-learning project, but its predictions should not be used for medical diagnosis or treatment decisions.
+However, the recall for the diabetic class was **43.95%**, meaning the model did not identify all diabetic cases correctly. The precision for the diabetic class was **33.66%**.
+
+Therefore, the model is suitable as an **educational machine-learning demonstration**, but its predictions should not be interpreted as medical diagnoses or validated individual health-risk estimates.
+
+---
 
 ## 7. Application Features
 
-### Page 1: Diabetes Prediction
+The application is developed using **Streamlit**.
 
-The Streamlit form accepts the 21 features used by the trained model, including:
+### Page 1 — Diabetes Prediction
 
-- Age category, sex category, BMI, education, and income
-- High blood pressure and high cholesterol indicators
-- Cholesterol-check indicator
-- Smoking, stroke, and heart-disease indicators
-- Physical activity, fruit and vegetable consumption, and heavy-alcohol indicator
-- Healthcare coverage and cost-related barrier to seeing a doctor
-- General health, poor mental-health days, poor physical-health days, and difficulty walking
+The application accepts the 21 features used by the trained model, including:
 
-After submission, the app displays:
+- Age category
+- Sex
+- BMI
+- Education
+- Income
+- High blood pressure
+- High cholesterol
+- Cholesterol check
+- Smoking
+- Stroke history
+- Heart disease or heart attack
+- Physical activity
+- Fruit consumption
+- Vegetable consumption
+- Heavy alcohol consumption
+- Healthcare coverage
+- Cost-related barrier to seeing a doctor
+- General health
+- Poor mental-health days
+- Poor physical-health days
+- Difficulty walking
 
-- The model's binary category prediction
-- The model-estimated probability for the diabetic class
-- A summary of selected health information
-- A bar chart of selected binary health indicators
+After submitting the form, the application displays:
 
-The displayed probability is the classifier's estimate and is not necessarily calibrated. It is **not** a validated personal medical-risk percentage.
+- Predicted category
+- Estimated probability for the diabetic class
+- Summary of selected health information
+- Bar chart of selected binary health indicators
 
-### Page 2: Dataset Analysis
+The displayed probability is the classifier's estimated probability and is **not a clinically calibrated individual diabetes-risk percentage**.
 
-The analysis page displays:
+### Page 2 — Dataset Analysis
 
-- Dataset size, number of columns, and total missing values
-- A preview of the dataset
-- Counts for all three original target categories
-- A BMI histogram
-- Diabetes-category percentages across age categories
-- Average BMI by original diabetes category
-- A correlation heatmap for selected numeric health indicators
-- Missing-value counts for columns with missing data, if any
+The Dataset Analysis page displays:
 
-Correlation indicates association and does not establish causation.
+- Dataset size
+- Number of columns
+- Total missing values
+- Dataset preview
+- Original diabetes-category distribution
+- BMI histogram
+- Diabetes-category percentages across age groups
+- Average BMI by diabetes category
+- Correlation heatmap
+- Missing-value analysis
+
+Correlation represents association between variables and does not establish causation.
+
+---
 
 ## 8. Project Structure
 
+The current project structure is:
+
 ```text
 AI-Based-Diabetes-Prediction/
+│
 ├── app.py
 ├── train_model.py
 ├── requirements.txt
 ├── README.md
-├── diabetes_012_health_indicators_BRFSS2015.CSV
+├── .gitignore
+├── diabetes_012_health_indicators_BRFSS2015.csv
+│
 └── model/
-    ├── diabetes_model.pkl
+    ├── diabetes_model_deploy.pkl
     └── feature_importance.csv
 ```
 
-Keep the dataset filename consistent with the path configured in `train_model.py` and the path used by `app.py`.
+### Local Development Model
 
-## 9. Requirements
+The original larger model file may also exist locally:
 
-The `requirements.txt` file should contain:
+```text
+model/diabetes_model.pkl
+```
+
+This large file is intentionally excluded from GitHub because GitHub has a hard file-size limit.
+
+The deployment version is:
+
+```text
+model/diabetes_model_deploy.pkl
+```
+
+---
+
+## 9. Technologies Used
+
+- **Python**
+- **Pandas**
+- **NumPy**
+- **Scikit-learn**
+- **Joblib**
+- **Streamlit**
+- **Matplotlib**
+- **Git**
+- **GitHub**
+
+---
+
+## 10. Requirements
+
+The `requirements.txt` file contains the main dependencies required to run the project:
 
 ```text
 pandas
@@ -226,59 +391,145 @@ streamlit
 matplotlib
 ```
 
-## 10. Installation and Running
+---
 
-### Step 1: Open the project folder
+## 11. Installation and Running Locally
 
-Open the `AI-Based-Diabetes-Prediction` directory in VS Code.
+### Step 1 — Open the Project
 
-### Step 2: (Recommended) Create and activate a virtual environment
+Open the following folder in VS Code:
+
+```text
+AI-Based-Diabetes-Prediction
+```
+
+### Step 2 — Create a Virtual Environment
 
 On Windows:
 
-```bash
+```powershell
 python -m venv .venv
-.venv\\Scripts\\activate
 ```
 
-### Step 3: Install dependencies
+Activate it:
 
-```bash
+```powershell
+.venv\Scripts\activate
+```
+
+### Step 3 — Install Dependencies
+
+```powershell
 python -m pip install -r requirements.txt
 ```
 
-### Step 4: Train the model (only if the saved model is missing or you want to retrain)
+### Step 4 — Train the Model
 
-```bash
+Training is only required if the saved model is missing or the model needs to be retrained.
+
+```powershell
 python train_model.py
 ```
 
-After successful training, the script saves:
+The training script generates the model and feature-importance information.
 
-- `model/diabetes_model.pkl`
-- `model/feature_importance.csv`
+### Step 5 — Run the Streamlit Application
 
-### Step 5: Run the web application
-
-```bash
+```powershell
 python -m streamlit run app.py
 ```
 
-Streamlit will display a local address, usually `http://localhost:8501`. Open that address in your browser. Keep the terminal process running while using the application.
+The application normally opens at:
 
-## 11. Limitations
+```text
+http://localhost:8501
+```
 
-- The project uses survey-derived indicators from the BRFSS 2015 dataset, not current clinical examination or laboratory data.
-- There is no glucose feature in this dataset.
-- Prediabetes is grouped into the model's non-diabetic class for binary classification.
-- The dataset has an imbalanced target distribution.
-- The model may miss diabetic-class cases.
-- The displayed model probability is not clinically calibrated or validated as an individual risk estimate.
-- Correlation charts show association, not causation.
-- The model is for educational use only and must not be used to make medical decisions.
+Keep the terminal running while using the application.
 
-## 12. Conclusion
+---
 
-This project demonstrates an educational machine-learning workflow: validating and preparing a binary target, selecting features, training and evaluating a Random Forest classifier, saving the model pipeline, building an interactive Streamlit interface, and exploring health-indicator patterns through visualizations.
+## 12. Deployment
 
-Further work could investigate probability calibration, alternative approaches to class imbalance, and more thorough external evaluation. Any changes should be tested and documented before being described as completed.
+The project is deployed using **Streamlit Community Cloud**.
+
+The application source code and deployment model are maintained in the GitHub repository.
+
+### Deployment Components
+
+- GitHub repository
+- Streamlit application
+- `app.py`
+- `requirements.txt`
+- Dataset CSV
+- Deployment model
+- Feature-importance CSV
+
+The application uses relative paths so that the dataset and model can be accessed correctly when deployed.
+
+The dataset filename must remain exactly:
+
+```text
+diabetes_012_health_indicators_BRFSS2015.csv
+```
+
+File-name capitalization should not be changed because deployment environments such as Linux are case-sensitive.
+
+---
+
+## 13. Limitations
+
+This project has several limitations:
+
+1. The dataset contains survey-derived health indicators rather than current clinical examination or laboratory measurements.
+2. The dataset does not contain a glucose measurement.
+3. Prediabetes is grouped into the Non-Diabetic class for binary classification.
+4. The target classes are imbalanced.
+5. The model may incorrectly classify some diabetic cases as non-diabetic.
+6. The model's probability output is not clinically calibrated.
+7. The dataset represents BRFSS 2015 data and may not represent current populations or healthcare conditions.
+8. Correlation analysis shows association and does not establish causation.
+9. The model has not been clinically validated.
+10. The system should not be used to make medical or treatment decisions.
+
+---
+
+## 14. Future Enhancements
+
+Possible future improvements include:
+
+- Probability calibration.
+- Advanced techniques for handling class imbalance.
+- Hyperparameter optimization.
+- Testing additional machine-learning algorithms.
+- External validation using newer datasets.
+- Improved model interpretability.
+- Additional visualization and analytics.
+- More comprehensive feature engineering.
+- Separate classification of No Diabetes, Prediabetes, and Diabetes.
+- Integration with clinically validated datasets where appropriate.
+
+Any future enhancement should be properly tested and evaluated before being presented as a completed feature.
+
+---
+
+## 15. Conclusion
+
+The **AI-Based Diabetes Prediction System** demonstrates an end-to-end machine-learning workflow using health-indicator data.
+
+The project includes:
+
+- Dataset validation and preparation
+- Binary target transformation
+- Feature selection
+- Random Forest classification
+- Model evaluation
+- Feature-importance analysis
+- Interactive Streamlit interface
+- Dataset visualization
+- GitHub-based source-code management
+- Streamlit Cloud deployment
+
+The project demonstrates how machine-learning techniques can be applied to survey-based health data while also highlighting the importance of understanding model limitations, class imbalance, and responsible interpretation of predictions.
+
+> **Disclaimer:** This application is developed for educational purposes only. It is not a medical diagnostic system, and its predictions must not be used for medical diagnosis, treatment, or healthcare decisions.
