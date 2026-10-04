@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 *.zip
 model/diabetes_model.pkl
+model/diabetes_model_compressed.pkl

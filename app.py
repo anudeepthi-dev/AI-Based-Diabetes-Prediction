@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 BASE_DIR = Path(__file__).parent
-MODEL_PATH = BASE_DIR / "model" / "diabetes_model.pkl"
+MODEL_PATH = BASE_DIR / "model" / "diabetes_model_deploy.pkl"
 DATASET_PATH = BASE_DIR / "diabetes_012_health_indicators_BRFSS2015.CSV"
 
 FEATURES = [
@@ -85,7 +85,7 @@ st.warning(
 if model is None:
     st.error(
         "Trained model not found. Please run train_model.py first "
-        "and verify that model/diabetes_model.pkl exists."
+        "and verify that model/diabetes_model_deploy.pkl exists."
     )
     st.stop()
 
